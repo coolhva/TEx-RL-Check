@@ -4,7 +4,19 @@
 IOC's need to be added to the policy to avoid large custom policies.
 
 The input CSV file needs to contain the field Indicator and ThreatType for this
-script to function!"""
+script to function!
+
+Installation:
+
+  1. Create virtual env: python -m venv venv
+  2. Activate venv
+  3. Install requirements (pip install -r requirements.txt)
+  4. create .env file with TEXT_API_KEY key that holds the API key
+  5. Create output folder (mkdir output)
+  6. Run, with venv activated, python rlcheckmt.py <inputfile>
+  7. See on screen updates and output in output folder.
+
+"""
 __author__ = "Henk van Achterberg, PM Threat Intelligence, Broadcom"
 __copyright__ = "Copyright 2021, Henk van Achterberg"
 __credits__ = ["Henk van AChterberg"]
