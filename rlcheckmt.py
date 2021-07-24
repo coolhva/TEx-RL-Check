@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 
 """ Determine which IOC's are blocked by Broadcom already to understand which
-IOC's need to be added to the policy to avoid large custom policies. """
-__author__ = "Henk van Achterberg, Product Manager Threat Intelligence, Broadcom"
+IOC's need to be added to the policy to avoid large custom policies.
+
+The input CSV file needs to contain the field Indicator and ThreatType for this
+script to function!"""
+__author__ = "Henk van Achterberg, PM Threat Intelligence, Broadcom"
 __copyright__ = "Copyright 2021, Henk van Achterberg"
 __credits__ = ["Henk van AChterberg"]
 __license__ = "GPL"
