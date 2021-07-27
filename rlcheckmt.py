@@ -11,7 +11,7 @@ Installation:
   1. Create virtual env: python -m venv venv
   2. Activate venv
   3. Install requirements (pip install -r requirements.txt)
-  4. create .env file with TEXT_API_KEY key that holds the API key
+  4. create .env file with TEX_API_KEY key that holds the API key
   5. Create output folder (mkdir output)
   6. Run, with venv activated, python rlcheckmt.py <inputfile>
   7. See on screen updates and output in output folder.
@@ -43,7 +43,7 @@ class CSVWriter:
     """Write CSV files trough a queue"""
 
     def __init__(self, *args):
-        self.filewriter = open(args[0], args[2])
+        self.filewriter = open(args[0], args[2], newline='')
         self.csvwriter = csv.DictWriter(self.filewriter, fieldnames=args[1])
         self.csvwriter.writeheader()
         self.queue = queue.Queue()
@@ -131,7 +131,7 @@ def log(message):
 
 # Use dotenv to save the API key in ".env" file under the key TEX_API_KEY
 # Example .env file:
-# TEXT_API_KEY = 201002467ae044f6-99b9b747d23659838b125fa28a984b118f268468c5ce76817e1d3b999ec942ce
+# TEX_API_KEY = 201002467ae044f6-99b9b747d23659838b125fa28a984b118f268468c5ce76817e1d3b999ec942ce
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 dotenv.load_dotenv(dotenv_path)
