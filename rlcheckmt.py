@@ -19,7 +19,7 @@ Installation:
 """
 __author__ = "Henk van Achterberg, PM Threat Intelligence, Broadcom"
 __copyright__ = "Copyright 2021, Henk van Achterberg"
-__credits__ = ["Henk van AChterberg"]
+__credits__ = ["Henk van Achterberg"]
 __license__ = "GPL"
 __version__ = "0.9"
 __maintainer__ = "Henk van Achterberg"
