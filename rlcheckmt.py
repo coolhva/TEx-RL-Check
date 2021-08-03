@@ -36,97 +36,6 @@ import requests
 import queue
 import threading
 
-# ----------------------------- Helper classes ------------------------------ #
-
-
-class CSVWriter:
-    """Write CSV files trough a queue"""
-
-    def __init__(self, *args):
-        self.filewriter = open(args[0], args[2], newline='')
-        self.csvwriter = csv.DictWriter(self.filewriter, fieldnames=args[1])
-        self.csvwriter.writeheader()
-        self.queue = queue.Queue()
-        self.finished = False
-        threading.Thread(name="CSVWriter", target=self.internal_writer).start()
-
-    def write(self, data):
-        self.queue.put(data)
-
-    def internal_writer(self):
-        while not self.finished:
-            try:
-                data = self.queue.get(True, 1)
-                self.csvwriter.writerow(data)
-                self.queue.task_done()
-            except queue.Empty:
-                continue
-
-    def close(self):
-        self.queue.join()
-        self.finished = True
-        self.filewriter.close()
-
-
-class IOCStat:
-    def __init__(self, *args):
-        self.ioc_blocked = 0
-        self.ioc_policy = 0
-        self.ioc_error = 0
-        self.ioc_total = 0
-        self.queue = queue.Queue()
-        self.update_interval = args[0]
-        self.lastoutput = (datetime.datetime.now() -
-                           datetime.timedelta(seconds=60))
-        self.finished = False
-        threading.Thread(name="IOCStat", target=self.stat_keeper).start()
-
-    def update(self, data):
-        self.queue.put(data)
-
-    def stats(self):
-        ret = dict()
-        ret['ioc_total'] = self.ioc_total
-        ret['ioc_blocked'] = self.ioc_blocked
-        ret['ioc_policy'] = self.ioc_policy
-        ret['ioc_error'] = self.ioc_error
-        return ret
-
-    def stat_keeper(self):
-        while not self.finished:
-            try:
-                if (datetime.datetime.now() -
-                   self.lastoutput).total_seconds() > self.update_interval:
-                    self.lastoutput = datetime.datetime.now()
-                    sys.stdout.write(f"\r[{self.lastoutput}] "
-                                     f"Processed: {self.ioc_total}, "
-                                     f"Blocked: {self.ioc_blocked}, "
-                                     f"Policy: {self.ioc_policy}, "
-                                     f"Error: {self.ioc_error}")
-                    sys.stdout.flush()
-
-                data = self.queue.get(True, 1)
-                if data['type'] == 'blocked':
-                    self.ioc_blocked += 1
-                elif data['type'] == 'policy':
-                    self.ioc_policy += 1
-                elif data['type'] == 'error':
-                    self.ioc_error += 1
-                self.ioc_total += 1
-                self.queue.task_done()
-            except queue.Empty:
-                continue
-
-    def close(self):
-        self.queue.join()
-        self.finished = True
-
-
-def log(message):
-    ts = datetime.datetime.now()
-    print(f"[{ts}] {message}")
-
-
 # ------------------------ Application variables ---------------------------- #
 
 # Use dotenv to save the API key in ".env" file under the key TEX_API_KEY
@@ -236,6 +145,97 @@ BLOCKED_CATEGORY_IDS = [17, 18, 43, 44]
 # 118 Piracy/Copyright Concerns
 # 121 Marijuana
 
+# ----------------------------- Helper classes ------------------------------ #
+
+
+class CSVWriter:
+    """Write CSV files trough a queue"""
+
+    def __init__(self, *args):
+        self.filewriter = open(args[0], args[2], newline='')
+        self.csvwriter = csv.DictWriter(self.filewriter, fieldnames=args[1])
+        self.csvwriter.writeheader()
+        self.queue = queue.Queue()
+        self.finished = False
+        threading.Thread(name="CSVWriter", target=self.internal_writer).start()
+
+    def write(self, data):
+        self.queue.put(data)
+
+    def internal_writer(self):
+        while not self.finished:
+            try:
+                data = self.queue.get(True, 1)
+                self.csvwriter.writerow(data)
+                self.queue.task_done()
+            except queue.Empty:
+                continue
+
+    def close(self):
+        self.queue.join()
+        self.finished = True
+        self.filewriter.close()
+
+
+class IOCStat:
+    def __init__(self, *args):
+        self.ioc_blocked = 0
+        self.ioc_policy = 0
+        self.ioc_error = 0
+        self.ioc_total = 0
+        self.queue = queue.Queue()
+        self.update_interval = args[0]
+        self.lastoutput = (datetime.datetime.now() -
+                           datetime.timedelta(seconds=60))
+        self.finished = False
+        threading.Thread(name="IOCStat", target=self.stat_keeper).start()
+
+    def update(self, data):
+        self.queue.put(data)
+
+    def stats(self):
+        ret = dict()
+        ret['ioc_total'] = self.ioc_total
+        ret['ioc_blocked'] = self.ioc_blocked
+        ret['ioc_policy'] = self.ioc_policy
+        ret['ioc_error'] = self.ioc_error
+        return ret
+
+    def stat_keeper(self):
+        while not self.finished:
+            try:
+                if (datetime.datetime.now() -
+                   self.lastoutput).total_seconds() > self.update_interval:
+                    self.lastoutput = datetime.datetime.now()
+                    sys.stdout.write(f"\r[{self.lastoutput}] "
+                                     f"Processed: {self.ioc_total}, "
+                                     f"Blocked: {self.ioc_blocked}, "
+                                     f"Policy: {self.ioc_policy}, "
+                                     f"Error: {self.ioc_error}")
+                    sys.stdout.flush()
+
+                data = self.queue.get(True, 1)
+                if data['type'] == 'blocked':
+                    self.ioc_blocked += 1
+                elif data['type'] == 'policy':
+                    self.ioc_policy += 1
+                elif data['type'] == 'error':
+                    self.ioc_error += 1
+                self.ioc_total += 1
+                self.queue.task_done()
+            except queue.Empty:
+                continue
+
+    def close(self):
+        self.queue.join()
+        self.finished = True
+
+
+def log(message):
+    ts = datetime.datetime.now()
+    print(f"[{ts}] {message}")
+
+
 # Initialize multi threading variables and the queue used for the IOC's
 num_worker_threads = 0
 status_update_interval = 0
@@ -299,13 +299,19 @@ def do_work(item, csv_blocked, csv_policy, csv_error, stat):
     """Look up IOC, augment with api data and write it to the correct file"""
 
     ret = rlcheck(item["Indicator"])
+    categories = ""
     if ret['error'] != 0:
         log(f"Error {ret['error']} while processing {item['Indicator']}")
         stat.update({'type': 'error'})
         csv_error.write(item)
     else:
+        for cat in ret['category']:
+            if categories == "":
+                categories = cat
+            else:
+                categories += ', ' + cat
         item.update({'BC_RiskLevel': ret['risklevel'],
-                    'BC_Category': ret['category']})
+                    'BC_Category': categories})
         if ret['blocked'] == 1:
             csv_blocked.write(item)
             stat.update({'type': 'blocked'})
