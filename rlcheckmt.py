@@ -152,8 +152,10 @@ class CSVWriter:
     """Write CSV files trough a queue"""
 
     def __init__(self, *args):
-        self.filewriter = open(args[0], args[2], newline='')
-        self.csvwriter = csv.DictWriter(self.filewriter, fieldnames=args[1])
+        self.filewriter = open(args[0], args[2],
+                               newline='', encoding="utf-8-sig")
+        self.csvwriter = csv.DictWriter(self.filewriter, fieldnames=args[1],
+                                        dialect='excel', delimiter=";")
         self.csvwriter.writeheader()
         self.queue = queue.Queue()
         self.finished = False
@@ -373,7 +375,7 @@ def main(argv=sys.argv):
         outpath, ts + '_error' + '_' + os.path.basename(fname))
 
     # Get fieldnames from inputfile and add api return fields
-    with open(fname) as csv_file:
+    with open(fname, encoding='utf-8-sig') as csv_file:
         csv_reader = csv.DictReader(csv_file)
 
         for row in csv_reader:
