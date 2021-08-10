@@ -283,9 +283,12 @@ def rlcheck(ioc):
             level = data["threatRiskLevel"]["level"]
             ret['risklevel'] = level
 
-            if level >= MIN_BLOCKED_RISK_LEVEL:
+            if isinstance(level, int) & level >= MIN_BLOCKED_RISK_LEVEL:
                 ret['blocked'] = 1
                 ret['blocked_by_rl'] = 1
+            else:
+                response.status_code == 400
+                ret['error'] = 'No risklevel returned from API'
 
     elif response.status_code == 400:
         ret['error'] = 400
