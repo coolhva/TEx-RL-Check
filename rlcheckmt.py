@@ -397,6 +397,12 @@ def main(argv=sys.argv):
             fieldnames = row
             fieldnames.update({'BC_RiskLevel': '',
                                'BC_Category': ''})
+            if not ('Indicator' in fieldnames):
+                log(f'Unable to find the column Indicator in {fname}')
+                return
+            if not ('ThreatType' in fieldnames):
+                log(f'Unable to find the column ThreatType in {fname}')
+                return
             break
         # go to begining of file to count IOC's (minus header)
         csv_file.seek(0)
