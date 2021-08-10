@@ -283,7 +283,7 @@ def rlcheck(ioc):
             level = data["threatRiskLevel"]["level"]
             ret['risklevel'] = level
 
-            if isinstance(level, int) & level >= MIN_BLOCKED_RISK_LEVEL:
+            if isinstance(level, int) and level >= MIN_BLOCKED_RISK_LEVEL:
                 ret['blocked'] = 1
                 ret['blocked_by_rl'] = 1
             else:
