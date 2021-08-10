@@ -185,6 +185,7 @@ class IOCStat:
         self.ioc_policy = 0
         self.ioc_error = 0
         self.ioc_total = 0
+        self.printed_stat = 1
         self.queue = queue.Queue()
         self.update_interval = args[0]
         self.lastoutput = (datetime.datetime.now() -
@@ -215,6 +216,7 @@ class IOCStat:
                                      f"Policy: {self.ioc_policy}, "
                                      f"Error: {self.ioc_error}")
                     sys.stdout.flush()
+                    self.printed_stat = 1
 
                 data = self.queue.get(True, 1)
                 if data['type'] == 'blocked':
@@ -243,6 +245,7 @@ num_worker_threads = 0
 status_update_interval = 0
 q = queue.Queue()
 threads = []
+status_output = 0
 
 
 def rlcheck(ioc):
@@ -312,6 +315,9 @@ def do_work(item, csv_blocked, csv_policy, csv_error, stat):
 
     categories = ""
     if ret['error'] != 0:
+        if stat.printed_stat == 1:
+            print("")
+            stat.printed_stat = 0
         log(f"Error {ret['error']} while processing {item['Indicator']}")
         stat.update({'type': 'error'})
         csv_error.write(item)
