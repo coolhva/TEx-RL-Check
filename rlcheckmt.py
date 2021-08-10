@@ -304,7 +304,12 @@ def rlcheck(ioc):
 def do_work(item, csv_blocked, csv_policy, csv_error, stat):
     """Look up IOC, augment with api data and write it to the correct file"""
 
-    ret = rlcheck(item["Indicator"])
+    try:
+        ret = rlcheck(item["Indicator"])
+    except Exception as e:
+        ret = []
+        ret['error'] = e
+
     categories = ""
     if ret['error'] != 0:
         log(f"Error {ret['error']} while processing {item['Indicator']}")
